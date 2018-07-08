@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+.card {
+    box-shadow: 4px 4px 10px 4px rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 5px;
+    margin: auto;
+    width: 70%;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+canvas {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+</style>
+</head>
+<body onload="startGame()">
+<div class = "card" id = "main">
+<canvas  id="canvas" class = "card" width="200" height="100"></canvas>
+<br>
+<div class = "card">
+	<p id = "textView" style='text-align:center;font-size: 40px;font-family: "Courier New", cursive;'><br>Grunter</p>
+	<br>
+</div>
+<div class = "card">
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 99%; margin: 3px">
+	Свинья
+	</button>
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 99%; margin: 3px">
+	Трактор
+	</button>
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 99%; margin: 3px">
+	Хрюкающее животное
+	</button>
+	<br>
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"style="width: 99%; margin: 3px">
+	Поросёнок
+	</button>
+</div>
+</div>
+</body>
+
+<script>
+
+var myGamePiece;
+var myBackground;
+var text_view;
+var canvas_width = 800;
+var canvas_height = 300;
+function startGame() {
+    myGamePiece = new component(120, 120, "petr.png", canvas_width/2-120, 170, "image");
+    myBackground = new component(canvas_width*2, canvas_height, "background_krita.png", 0, 0, "background");
+    text_view = new text();
+    myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.getElementById("canvas"),
+    start : function() {
+        this.canvas.width = canvas_width;
+        this.canvas.height = canvas_height;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 20);
+        },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    stop : function() {
+        clearInterval(this.interval);
+    }
+}
+function text()
+{
+	console.log(myGameArea)
+	this.update = function()
+	{
+	    
+	}
+}
+function component(width, height, color, x, y, type) {
+    this.type = type;
+    if (type == "image" || type == "background") {
+        this.image = new Image();
+        this.image.src = color;
+    }
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = myGameArea.context;
+        if (type == "image" || type == "background") {
+            ctx.drawImage(this.image, 
+                this.x, 
+                this.y,
+                this.width, this.height);
+        if (type == "background") {
+            ctx.drawImage(this.image, 
+                this.x + this.width, 
+                this.y,
+                this.width, this.height);
+        }
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.type == "background") {
+            if (this.x == -(this.width)) {
+                this.x = 0;
+            }
+        }
+    }    
+}
+
+function updateGameArea() {
+    myGameArea.clear();
+    myBackground.speedX = -2;
+    myBackground.newPos();    
+    myBackground.update();
+    myGamePiece.newPos();    
+    myGamePiece.update();
+    text_view.update()
+}
+
+function move(dir) {
+    myGamePiece.image.src = "petr.png";
+    if (dir == "up") {myGamePiece.speedY = -1; }
+    if (dir == "down") {myGamePiece.speedY = 1; }
+    if (dir == "left") {myGamePiece.speedX = -1; }
+    if (dir == "right") {myGamePiece.speedX = 1; }
+}
+
+function clearmove() {
+    myGamePiece.image.src = "petr.png";
+    myGamePiece.speedX = 0; 
+    myGamePiece.speedY = 0; 
+}
+
+</script>
+
+
+</html>

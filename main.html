@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
 <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<script defer src="quests.js"></script>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -28,46 +29,106 @@ canvas {
 }
 </style>
 </head>
-<body onload="startGame()">
-<div class = "card" id = "main">
+<body onload="startGame2()">
+
+<div class = "card" id = "main_menu">
+    <center>
+        
+        <img src="main_menu.jpeg">
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"style="width: 99%; margin: 3px"
+    onclick="startGame()" id="button_restart">
+        Начать путешествие!
+    </button>
+</div>
+
+<div class = "card" id = "main_game" hidden>
 <canvas  id="canvas" class = "card" width="200" height="100"></canvas>
 <br>
-<div class = "card">
-	<p id = "textView" style='text-align:center;font-size: 40px;font-family: "Courier New", cursive;'><br>Grunter</p>
-	<br>
+<div class = "card" id="card_answer">
+        <p id = "text_view_quest" style='text-align:center;font-size: 40px;font-family: "Courier New", cursive;'><br>Grunter</p>
+        <br>
+    </div>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 99%; margin: 3px"
+    onclick="answerClick(0)" id="button_answer_0">
+    	Свинья
+    	</button>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 99%; margin: 3px"
+    onclick="answerClick(1)" id="button_answer_1">
+    	Трактор
+    	</button>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 99%; margin: 3px"
+    onclick="answerClick(2)" id="button_answer_2">
+    	Хрюкающее животное
+    	</button>
+    	<br>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"style="width: 99%; margin: 3px"
+    onclick="answerClick(3)" id="button_answer_3">
+    	Поросёнок
+    	</button>
 </div>
-<div class = "card">
-<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 99%; margin: 3px">
-	Свинья
-	</button>
-<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 99%; margin: 3px">
-	Трактор
-	</button>
-<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="width: 99%; margin: 3px">
-	Хрюкающее животное
-	</button>
-	<br>
-<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"style="width: 99%; margin: 3px">
-	Поросёнок
-	</button>
+
+<div class = "card" id="card_restart" hidden>
+    <center>
+        <p id = "text_view_quest" style='text-align:center;font-size: 40px;font-family: "Courier New", cursive;'><br>ПОРОСЕНОК ПЕТР НЕДОЕХАЛ ДО ЗАПАДНОЙ ВИРДЖИНИИ((9(</p>
+        <br>
+        <br>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"style="width: 99%; margin: 3px"
+    onclick="startGame()" id="button_restart">
+        Можем повторить!
+    </button>
+    
+
+    </center>
 </div>
+
 </div>
+
+
+
+
 </body>
 
 <script>
-
+var first_start = true;
+var pigBoost = 0;
 var myGamePiece;
 var myBackground;
 var text_view;
 var canvas_width = 800;
 var canvas_height = 300;
+var quests;
+var true_answer = -1;
+var random_quest_key = "";
+var random_quest_val = "";
+
 function startGame() {
-    myGamePiece = new component(120, 120, "petr.png", canvas_width/2-120, 170, "image");
+    document.getElementById("main_game").hidden = false;
+
+    document.getElementById("main_menu").hidden = true;
+    document.getElementById("card_answer").hidden = false;
+    document.getElementById("card_restart").hidden = true;
+    myGamePiece = new component(120, 120, "petr.png", canvas_width/2-10, 170, "image");
     myBackground = new component(canvas_width*2, canvas_height, "background_krita.png", 0, 0, "background");
     text_view = new text();
-    myGameArea.start();
+    if(first_start)
+    {
+        myGameArea.start('track0.ogg');
+        musicStart();
+    }
+    first_start = false;
+
 }
 
+function musicStart(track)
+{
+    myAudio = new Audio('track0.ogg'); 
+    
+        myAudio.addEventListener('ended', function() {
+            this.currentTime = 0;
+            this.play();
+        }, false);
+        myAudio.play();
+}
 var myGameArea = {
     canvas : document.getElementById("canvas"),
     start : function() {
@@ -137,6 +198,28 @@ function component(width, height, color, x, y, type) {
 function updateGameArea() {
     myGameArea.clear();
     myBackground.speedX = -2;
+    if(pigBoost > 0)
+    {
+       myGamePiece.speedX = 0.5; 
+       pigBoost-=1;
+    }
+
+    if(pigBoost < 0)
+    {
+        myGamePiece.speedX = -0.5; 
+        pigBoost+=1;
+    }
+
+    if(pigBoost == 0)
+    {
+        myGamePiece.speedX = -0.2;
+    }
+    if(myGamePiece.x < 0)
+    {
+        document.getElementById("card_restart").hidden = false;
+        document.getElementById("card_answer").hidden = true;
+        document.getElementById("main_game").hidden = true;
+    }
     myBackground.newPos();    
     myBackground.update();
     myGamePiece.newPos();    
@@ -158,6 +241,50 @@ function clearmove() {
     myGamePiece.speedY = 0; 
 }
 
+function answerClick(button_id)
+{
+    console.log(button_id);
+    if(button_id == true_answer)
+    {
+        pigBoost += 30;
+    }else
+    {
+        alert(random_quest_val);
+        pigBoost -= 10;
+    }
+    loadRandomQuest()
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+function loadRandomQuest()
+{
+    var answers_count = 4;
+    var random_quest = quests_list[getRandomInt(quests_list.length)];
+    console.log(quests_list);
+    true_answer = getRandomInt(4);
+    for(var i = 0; i < answers_count; i+=1)
+    {
+        if(i == true_answer)
+        {
+            random_quest_key = random_quest.split("-")[0];
+            random_quest_val = random_quest.split("-")[1];
+            document.getElementById("text_view_quest").innerHTML = "<br>"+random_quest_key;
+            document.getElementById("button_answer_"+true_answer).innerHTML = random_quest_val;
+        }else
+        {
+            var false_random_quest = quests_list[getRandomInt(quests_list.length)];
+            while(false_random_quest == random_quest)
+            {
+                false_random_quest = quests_list[getRandomInt(quests_list.length)];
+            }
+            false_random_quest_val = false_random_quest.split("-")[1];
+            document.getElementById("button_answer_"+i).innerHTML = false_random_quest_val;
+        }
+    }
+}
 </script>
 
 
